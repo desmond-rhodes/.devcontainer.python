@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -euxo pipefail
+
+'cache-micromamba' 'start'
+
+'cache-curl' 'https://micro.mamba.pm/api/micromamba/linux-64/latest' | tar -jxC "${HOME}" 'bin/micromamba'
+
+bash -l <<-'EOF'
+	set -euxo pipefail
+
+	micromamba shell init -s bash -r "${HOME}/micromamba"
+	micromamba config append channels 'conda-forge'
+	micromamba config set channel_priority 'strict'
+	micromamba env create -y -n 'python' python
+EOF
+
+printf "\nmicromamba activate 'python'\n" >> "${HOME}/.bashrc"
+
+'cache-micromamba' 'stop'
